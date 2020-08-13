@@ -1,8 +1,7 @@
 ; (function ($) {
     $(document).ready(function () {
-
         $("#qofw_genpw").on('click', function () {
-            $.post(, function (data) {
+            $.post({}, function (data) {
                 $("#password").val(data);
             });
         });
@@ -24,7 +23,7 @@
             $("#last_name").val('');
             let email = $(this).val();
             //alert(qofw.ajax_url);
-            $.post(, function (data) {
+            $.post({}, function (data) {
                 if ($("#first_name").val() == '') {
                     $("#first_name").val(data.fn);
                 }
