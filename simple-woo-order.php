@@ -159,3 +159,27 @@ function swo_admin_page()
     </div>
     <?php
 }
+
+add_action('wp_ajax_swo_fetch_user', function () {
+    $email = strtolower(sanitize_text_field($_POST['email']));
+    $user = get_user_by_email($email);
+
+    if ($user) {
+        wp_send_json(array(
+            'error' => false,
+            'id' => $user->ID,
+            'fn' => $user->first_name,
+            'ln' => $user->last_name,
+            'pn' => get_user_meta($user->ID, 'phone_number', true)
+        ), 200);
+
+    } else {
+        wp_send_json(array(
+            'error' => true,
+            'id' => 0,
+            'fn' => __('Not Found', 'swo'),
+            'ln' => __('Not Found', 'swo'),
+            'pn' => ''
+        ), 200);
+    }
+});

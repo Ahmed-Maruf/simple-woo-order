@@ -16,6 +16,7 @@
         });
 
         $("#email").on('blur', function () {
+
             if($(this).val()==''){
                 return;
             }
@@ -23,7 +24,8 @@
             $("#last_name").val('');
             let email = $(this).val();
             //alert(qofw.ajax_url);
-            $.post({}, function (data) {
+            $.post(swo.ajax_url, {'action': 'swo_fetch_user', 'email': email}, function (data) {
+                console.log(data);
                 if ($("#first_name").val() == '') {
                     $("#first_name").val(data.fn);
                 }
