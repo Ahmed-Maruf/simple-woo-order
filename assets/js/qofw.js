@@ -1,7 +1,7 @@
 ; (function ($) {
     $(document).ready(function () {
         $("#qofw_genpw").on('click', function () {
-            $.post({}, function (data) {
+            $.post(swo.ajax_url, {'action': 'swo_gen_password'}, function (data) {
                 $("#password").val(data);
             });
         });
@@ -25,7 +25,6 @@
             let email = $(this).val();
             //alert(qofw.ajax_url);
             $.post(swo.ajax_url, {'action': 'swo_fetch_user', 'email': email}, function (data) {
-                console.log(data);
                 if ($("#first_name").val() == '') {
                     $("#first_name").val(data.fn);
                 }

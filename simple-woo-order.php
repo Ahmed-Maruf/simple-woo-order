@@ -160,6 +160,7 @@ function swo_admin_page()
     <?php
 }
 
+
 add_action('wp_ajax_swo_fetch_user', function () {
     $email = strtolower(sanitize_text_field($_POST['email']));
     $user = get_user_by_email($email);
@@ -182,4 +183,8 @@ add_action('wp_ajax_swo_fetch_user', function () {
             'pn' => ''
         ), 200);
     }
+});
+
+add_action('wp_ajax_swo_gen_password', function (){
+    wp_send_json(wp_generate_password(12), 200);
 });
