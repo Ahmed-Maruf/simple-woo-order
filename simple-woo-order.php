@@ -186,5 +186,5 @@ add_action('wp_ajax_swo_fetch_user', function () {
 });
 
 add_action('wp_ajax_swo_gen_password', function (){
-    wp_send_json(wp_generate_password(12), 200);
+    wp_send_json(wp_generate_password(12));
 });
