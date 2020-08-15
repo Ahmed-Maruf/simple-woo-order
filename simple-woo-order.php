@@ -130,6 +130,17 @@ function swo_admin_page()
                             <label for='item'><?php echo $label; ?></label>
                             <select class='qofw-control' name='item' id='item'>
                                 <option value="0"><?php _e('Select One', 'swo'); ?></option>
+                                <?php
+                                $products = wc_get_products(array('post_status' => 'published', 'posts_per_page' => -1));
+
+                                foreach ($products as $product){
+                                ?>
+                                        <option value="<?php echo $product->get_ID();?>">
+                                            <?php echo $product->get_Name()?>
+                                        </option>
+                                    <?php
+                                }
+                                    ?>
                             </select>
                         </div>
 
