@@ -161,7 +161,7 @@ function swo_admin_page()
                         </div>
                     </fieldset>
                     <input type="hidden" name="action" value="swo_form">
-                    <input type="hidden" name="swo_identifier" value="">
+                    <input type="hidden" name="swo_identifier" value="<?php echo md5(time())?>">
                 </form>
             </div>
             <div class="qofw-info">
@@ -184,6 +184,12 @@ add_action('admin_post_swo_form', function () {
 
 function swo_process_order()
 {
+    $swp_order_identifier = $_POST['swo_identifier'];
+
+    $processed = get_transient("swo{$swp_order_identifier}");
+    if ($processed){
+        return $processed;
+    }
     //For new user
     if (sanitize_text_field($_POST['customer_id']) == 0) {
         $email = strtolower(sanitize_text_field($_POST['email']));
@@ -227,6 +233,8 @@ function swo_process_order()
         'billing_first_name' => $customer->first_name,
         'billing_last_name' => $customer->last_name,
     ));
+
+    set_transient("swo{$swp_order_identifier}", $order_id, 60);
 
     $order = wc_get_order($order_id);
     update_user_meta($order_id, '_customer_user', $customer->ID);
