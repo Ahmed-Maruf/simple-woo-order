@@ -49,7 +49,7 @@
 
 
         if ($('#qofw-edit-button').length > 0) {
-            tb_show(qofw.pt, "#TB_inline?inlineId=qofw-modal&width=700");
+            tb_show(swo.pt, "#TB_inline?inlineId=qofw-modal&width=700");
         }
     });
 })(jQuery);

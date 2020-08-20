@@ -41,6 +41,7 @@ function swo_enqueue_scripts()
             'dt' => __('Discount In Taka', 'qofw'),
             'pt' => __('WooCommerce Quick Order', 'qofw'), //plugin title
         ));
+    add_thickbox();
 }
 
 add_action('admin_enqueue_scripts', 'swo_enqueue_scripts');
@@ -71,7 +72,8 @@ function swo_admin_page()
         </div>
         <div class='qofw-form-container'>
             <div class="qofw-form">
-                <form action='<?php echo esc_url(admin_url('admin-post.php')); ?>' class='pure-form pure-form-aligned' method='POST'>
+                <form action='<?php echo esc_url(admin_url('admin-post.php')); ?>' class='pure-form pure-form-aligned'
+                      method='POST'>
                     <fieldset>
                         <input type='hidden' name='customer_id' id='customer_id' value='0'>
                         <div class='pure-control-group'>
@@ -161,7 +163,7 @@ function swo_admin_page()
                         </div>
                     </fieldset>
                     <input type="hidden" name="action" value="swo_form">
-                    <input type="hidden" name="swo_identifier" value="<?php echo md5(time())?>">
+                    <input type="hidden" name="swo_identifier" value="<?php echo md5(time()) ?>">
                 </form>
             </div>
             <div class="qofw-info">
@@ -170,6 +172,16 @@ function swo_admin_page()
         </div>
 
     </div>
+
+    <div id="qofw-modal">
+        <div class="qofw-modal-content">
+            <?php
+            if (isset($_GET['order_id'])){
+                do_action('swo_order_processing_complete', sanitize_text_field($_GET['order_id']));
+            }
+            ?>
+        </div>
+    </div>
     <?php
 }
 
@@ -177,7 +189,7 @@ add_action('admin_post_swo_form', function () {
     if (isset($_POST['submit'])) {
         $order_id = swo_process_order();
         wp_safe_redirect(
-                esc_url_raw(add_query_arg('order_id', $order_id, admin_url('admin.php?page=quick-order-create')))
+            esc_url_raw(add_query_arg('order_id', $order_id, admin_url('admin.php?page=quick-order-create')))
         );
     }
 });
@@ -187,7 +199,7 @@ function swo_process_order()
     $swp_order_identifier = $_POST['swo_identifier'];
 
     $processed = get_transient("swo{$swp_order_identifier}");
-    if ($processed){
+    if ($processed) {
         return $processed;
     }
     //For new user
@@ -217,7 +229,7 @@ function swo_process_order()
     $cart->add_to_cart(sanitize_text_field($_POST['item']), 1);
 
     $discount = trim(sanitize_text_field($_POST['discount']));
-    if ($discount == ''){
+    if ($discount == '') {
         $discount = 0;
     }
 
@@ -239,14 +251,14 @@ function swo_process_order()
     $order = wc_get_order($order_id);
     update_user_meta($order_id, '_customer_user', $customer->ID);
 
-    if ($is_coupon){
+    if ($is_coupon) {
         $order->apply_coupon($discount);
     } elseif ($discount) {
         $total = $order->calculate_totals();
         $order->set_discount_total($discount);
         $order->set_total($total - floatval($discount));
     }
-    if (isset($_POST['note']) && !empty($_POST['note'])){
+    if (isset($_POST['note']) && !empty($_POST['note'])) {
         $order_note = apply_filters('swo_order_note', sanitize_text_field($_POST['note']), $order_id);
         $order->add_order_note($order_note);
     }
@@ -283,4 +295,11 @@ add_action('wp_ajax_swo_fetch_user', function () {
 
 add_action('wp_ajax_swo_gen_password', function () {
     wp_send_json(wp_generate_password(12), 200);
+});
+
+add_action('swo_order_processing_complete', function ($order_id){
+    $order = wc_get_order($order_id);
+    $message =  __("<p>Your order number %s is now complete. Please click the next button to edit this order</p><p>%s</p>", 'qofw');
+    $order_button = sprintf("<a target='_blank' href='%s' id='qofw-edit-button' class='button button-primary button-hero'>%s %s</a>", $order->get_edit_order_url(), __('Edit Order # ', 'qofw'), $order_id);
+    printf($message, $order_id, $order_button);
 });
